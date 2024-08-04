@@ -2,6 +2,10 @@ pipeline {
   agent {
     kubernetes {
       yamlFile 'kaniko-builder.yaml'
+      defaultContainer 'jnlp'
+      credentialsId 'k8s'
+      namespace 'jenkins'
+      serverUrl 'https://kubernetes.default.svc'
     }
   }
 
@@ -23,6 +27,17 @@ pipeline {
     stage("Checkout from SCM") {
       steps {
         git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/siqueiraa/complete-prodcution-e2e-pipeline'
+      }
+    }
+
+    stage("Verify Kubernetes Connection") {
+      steps {
+        container(name: 'jnlp', shell: '/bin/sh') {
+          sh '''
+            echo "Verifying Kubernetes connection..."
+            kubectl get pods -n jenkins
+          '''
+        }
       }
     }
 
