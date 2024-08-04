@@ -30,8 +30,8 @@ pipeline {
       steps {
         container(name: 'kaniko', shell: '/busybox/sh') {
           sh '''#!/busybox/sh
-              echo "{\"auths\":{\"${OCI_SERVER}\":{\"username\":\"zrexacpiqwde/oracleidentitycloudservice/rafaelsiqueira06@gmail.com\",\"password\":\")l7JWI_uYq-3cyoVy2jO\"}}}" > /kaniko/.docker/config.json
-              /kaniko/executor --dockerfile `pwd`/Dockerfile_multiples_image --context `pwd` --destination=${OCI_IMAGE_NAME} --no-cache
+              /kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=${OCI_IMAGE_NAME} --no-cache
+
             '''
         }
       }
