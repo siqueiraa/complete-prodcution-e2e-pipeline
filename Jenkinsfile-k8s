@@ -30,7 +30,7 @@ pipeline {
       steps {
         container(name: 'kaniko', shell: '/busybox/sh') {
           sh '''#!/busybox/sh
-              /kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=${OCI_IMAGE_NAME}
+              /kaniko/executor --dockerfile=${WORKSPACE}/Dockerfile --context=${WORKSPACE} --destination=${OCI_IMAGE_NAME}
             '''
         }
       }
