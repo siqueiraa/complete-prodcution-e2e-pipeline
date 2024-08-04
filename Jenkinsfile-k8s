@@ -1,5 +1,4 @@
 pipeline {
-
   agent {
     kubernetes {
       yamlFile 'kaniko-builder.yaml'
@@ -7,38 +6,33 @@ pipeline {
   }
 
   environment {
-        APP_NAME = "complete-prodcution-e2e-pipeline"
-        RELEASE = "1.0.0"
-        DOCKER_USER = "dmancloud"
-        DOCKER_PASS = 'dockerhub'
-        IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
-        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-        /* JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN") */
-
-    }
+    APP_NAME = "complete-prodcution-e2e-pipeline"
+    OCI_SERVER = "zrh.ocir.io"
+    OCI_NAMESPACE = "zrexacpiqwde"
+    OCI_REPO = "trader_go"
+    OCI_IMAGE_NAME = "${OCI_SERVER}/${OCI_NAMESPACE}/${APP_NAME}:latest"
+  }
 
   stages {
-
     stage("Cleanup Workspace") {
       steps {
         cleanWs()
       }
     }
 
-    stage("Checkout from SCM"){
-            steps {
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/dmancloud/complete-prodcution-e2e-pipeline'
-            }
-
-        }
+    stage("Checkout from SCM") {
+      steps {
+        git branch: 'main', credentialsId: 'github', url: 'https://github.com/siqueiraa/complete-prodcution-e2e-pipeline'
+      }
+    }
 
     stage('Build & Push with Kaniko') {
       steps {
         container(name: 'kaniko', shell: '/busybox/sh') {
           sh '''#!/busybox/sh
-
-            /kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=${IMAGE_NAME}:${IMAGE_TAG} --destination=${IMAGE_NAME}:latest
-          '''
+              echo "{\"auths\":{\"${OCI_SERVER}\":{\"username\":\"zrexacpiqwde/oracleidentitycloudservice/rafaelsiqueira06@gmail.com\",\"password\":\")l7JWI_uYq-3cyoVy2jO\"}}}" > /kaniko/.docker/config.json
+              /kaniko/executor --dockerfile `pwd`/Dockerfile_multiples_image --context `pwd` --destination=${OCI_IMAGE_NAME} --no-cache
+            '''
         }
       }
     }
