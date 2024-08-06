@@ -1,11 +1,5 @@
 pipeline {
-  agent {
-    kubernetes {
-      yamlFile 'kaniko-builder.yaml'
-      defaultContainer 'jnlp'
-      namespace 'jenkins'
-    }
-  }
+  agent any
 
   environment {
     APP_NAME = "complete-production-e2e-pipeline"
@@ -38,7 +32,7 @@ pipeline {
 
     stage('Build & Push with Kaniko') {
       steps {
-        container(name: 'kaniko', shell: '/busybox/sh') {
+        container('kaniko') {
           sh '''#!/busybox/sh
               /kaniko/executor --dockerfile="${WORKSPACE}/Dockerfile" --context="${WORKSPACE}" --destination="${OCI_IMAGE_NAME}"
             '''
