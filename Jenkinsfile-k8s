@@ -18,7 +18,7 @@ pipeline {
 
     stage("Checkout from SCM") {
       steps {
-        git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/siqueiraa/complete-production-e2e-pipeline'
+        git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/siqueiraa/complete-prodcution-e2e-pipeline.git'
       }
     }
 
