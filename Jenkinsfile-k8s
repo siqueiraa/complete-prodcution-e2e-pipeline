@@ -29,6 +29,9 @@ pipeline {
             sh 'echo $KUBECONFIG > /.kube/config'
             sh 'kubectl get pods -n jenkins'
           }
+        }
+      }
+    }
 
     stage('Build & Push with Kaniko') {
       steps {
