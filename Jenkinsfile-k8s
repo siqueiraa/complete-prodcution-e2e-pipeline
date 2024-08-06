@@ -3,14 +3,12 @@ pipeline {
     kubernetes {
       yamlFile 'kaniko-builder.yaml'
       defaultContainer 'jnlp'
-      credentialsId 'k8s'
       namespace 'jenkins'
-      serverUrl 'https://kubernetes.default.svc'
     }
   }
 
   environment {
-    APP_NAME = "complete-prodcution-e2e-pipeline"
+    APP_NAME = "complete-production-e2e-pipeline"
     OCI_SERVER = "zrh.ocir.io"
     OCI_NAMESPACE = "zrexacpiqwde"
     OCI_REPO = "trader_go"
@@ -26,16 +24,17 @@ pipeline {
 
     stage("Checkout from SCM") {
       steps {
-        git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/siqueiraa/complete-prodcution-e2e-pipeline'
+        git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/siqueiraa/complete-production-e2e-pipeline'
       }
     }
 
-
     stage('Verify Kubernetes Connection') {
-      withKubeConfig([credentialsId: 'k8s', serverUrl: 'https://152.67.85.76:6443']) {
-      sh 'kubectl get pods -n jenkins'
+      steps {
+        withKubeConfig([credentialsId: 'k8s', serverUrl: 'https://152.67.85.76:6443']) {
+          sh 'kubectl get pods -n jenkins'
+        }
+      }
     }
-  }
 
     stage('Build & Push with Kaniko') {
       steps {
