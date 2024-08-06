@@ -30,7 +30,7 @@ pipeline {
 
     stage('Verify Kubernetes Connection') {
       steps {
-        withKubeConfig([credentialsId: 'k8s', serverUrl: 'https://152.67.85.76:6443']) {
+        withKubeConfig([credentialsId: 'k8s']) {
           sh 'kubectl get pods -n jenkins'
         }
       }
