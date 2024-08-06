@@ -30,16 +30,12 @@ pipeline {
       }
     }
 
-    stage("Verify Kubernetes Connection") {
-      steps {
-        container(name: 'jnlp', shell: '/bin/sh') {
-          sh '''
-            echo "Verifying Kubernetes connection..."
-            kubectl get pods -n jenkins
-          '''
-        }
-      }
+
+    stage('Verify Kubernetes Connection') {
+      withKubeConfig([credentialsId: 'k8s', serverUrl: 'https://152.67.85.76:6443']) {
+      sh 'kubectl get pods -n jenkins'
     }
+  }
 
     stage('Build & Push with Kaniko') {
       steps {
