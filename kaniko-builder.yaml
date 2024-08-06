@@ -5,15 +5,9 @@ spec:
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
     command:
-    - sh
+    - sleep
     args:
-    - -c
-    - |
-      apk add --no-cache curl \
-      && curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" \
-      && chmod +x ./kubectl \
-      && mv ./kubectl /usr/local/bin/kubectl \
-      && sleep 9999999
+    - 9999999
     volumeMounts:
       - name: jenkins-docker-cfg
         mountPath: /kaniko/.docker
