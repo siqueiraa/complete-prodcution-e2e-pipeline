@@ -24,7 +24,7 @@ pipeline {
 
     stage("Verify OCI CLI and Kubernetes Connection") {
       steps {
-        withCredentials([oci(credentialsId: 'ociconfig')]) {
+        withCredentials([ociCredential(credentialsId: 'ociconfig')]) {
           withKubeConfig([credentialsId: 'k8s']) {
             sh '''
               echo "Checking OCI CLI installation..."
