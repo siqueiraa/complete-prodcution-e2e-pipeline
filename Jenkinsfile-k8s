@@ -16,6 +16,13 @@ pipeline {
       }
     }
 
+    stage("Check OCI CLI") {
+    steps {
+        sh 'oci --version'
+    }
+}
+
+
     stage("Checkout from SCM") {
       steps {
         git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/siqueiraa/complete-prodcution-e2e-pipeline.git'
@@ -24,12 +31,21 @@ pipeline {
 
     stage("Verify OCI CLI and Kubernetes Connection") {
       steps {
+        withCredentials([ociCredential(credentialsId: 'ociconfig')]) {
           withKubeConfig([credentialsId: 'k8s']) {
             sh '''
+              echo "Checking OCI CLI installation..."
+              if ! command -v oci &> /dev/null
+              then
+                  echo "OCI CLI could not be found"
+                  exit 1
+              fi
+              echo "OCI CLI found: $(oci --version)"
               echo "Checking Kubernetes connection..."
               kubectl get pods -n jenkins
             '''
           }
+        }
       }
     }
 
