@@ -17,6 +17,19 @@ pipeline {
       }
     }
 
+    stage("List OCI CLI in venv") {
+    steps {
+        sh 'ls -l /opt/venv/bin'
+    }
+}
+
+stage("Check Symbolic Link") {
+    steps {
+        sh 'ls -l /usr/local/bin/oci'
+    }
+}
+
+
     stage("Test Environment") {
       steps {
         echo "Checking PATH..."
