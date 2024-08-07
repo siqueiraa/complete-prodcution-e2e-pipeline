@@ -8,8 +8,14 @@ pipeline {
     OCI_REPO = "trader_go"
     OCI_IMAGE_NAME = "${OCI_SERVER}/${OCI_NAMESPACE}/${APP_NAME}:latest"
     PATH = "/opt/venv/bin:$PATH"
-
   }
+
+  stage("Check Venv") {
+    steps {
+        sh 'ls -la /opt/venv/bin'
+    }
+}
+
 
   stages {
     stage("Cleanup Workspace") {
@@ -18,15 +24,7 @@ pipeline {
       }
     }
 
-stage("Setup OCI CLI") {
-    steps {
-        sh '''
-        #!/bin/bash
-        source /opt/venv/bin/activate
-        oci --version
-        '''
-    }
-}
+
 
 
 
