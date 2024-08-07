@@ -28,6 +28,12 @@ stage("Check OCI CLI Permissions") {
     }
 }
 
+stage("Find OCI CLI") {
+    steps {
+        sh 'find / -name oci 2>/dev/null'
+    }
+}
+
 
 
     stage("Checkout from SCM") {
