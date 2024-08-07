@@ -65,7 +65,7 @@ spec:
 
         stage("Verify OCI CLI and Kubernetes Connection") {
             steps {
-                withCredentials([ociCredentials(credentialsId: 'MY_OCI_CREDENTIAL')]) {
+                withCredentials([ociCredentials(credentialsId: 'ociconfig')]) {
                     withKubeConfig([credentialsId: 'k8s']) {
                         sh '''
                           echo "Checking OCI CLI installation..."
