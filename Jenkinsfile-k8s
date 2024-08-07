@@ -5,6 +5,7 @@ pipeline {
     APP_NAME = "complete-production-e2e-pipeline"
     OCI_SERVER = "zrh.ocir.io"
     OCI_NAMESPACE = "zrexacpiqwde"
+    OCI_REPO = "trader_go"
     OCI_IMAGE_NAME = "${OCI_SERVER}/${OCI_NAMESPACE}/${APP_NAME}:latest"
   }
 
@@ -21,17 +22,28 @@ pipeline {
       }
     }
 
-    stage('Verify OCI CLI and Kubernetes Connection') {
+    stage('Debug OCI CLI and PATH') {
+      steps {
+        sh '''
+          echo "Checking OCI CLI installation..."
+          if ! command -v oci &> /dev/null
+          then
+              echo "OCI CLI could not be found"
+              exit 1
+          fi
+          echo "OCI CLI found: $(oci --version)"
+          echo "PATH: $PATH"
+          echo "Listing /opt/venv/bin:"
+          ls -l /opt/venv/bin
+        '''
+      }
+    }
+
+    stage('Verify Kubernetes Connection') {
       steps {
         withKubeConfig([credentialsId: 'k8s']) {
           sh '''
-            echo "Checking OCI CLI installation..."
-            if ! command -v oci &> /dev/null
-            then
-                echo "OCI CLI could not be found"
-                exit 1
-            fi
-            oci --version
+            echo "Checking Kubernetes connection..."
             kubectl get pods -n jenkins
           '''
         }
