@@ -1,50 +1,97 @@
 pipeline {
-  agent any
-
-  environment {
-    APP_NAME = "complete-production-e2e-pipeline"
-    OCI_SERVER = "zrh.ocir.io"
-    OCI_NAMESPACE = "zrexacpiqwde"
-    OCI_IMAGE_NAME = "${OCI_SERVER}/${OCI_NAMESPACE}/${APP_NAME}:latest"
-    // Ensure the PATH is correctly set
-    PATH = "/opt/venv/bin:/usr/local/bin:$PATH"
-  }
-
-  stages {
-    stage("Cleanup Workspace") {
-      steps {
-        cleanWs()
-      }
-    }
-
-    stage("Checkout from SCM") {
-      steps {
-        git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/siqueiraa/complete-prodcution-e2e-pipeline.git'
-      }
-    }
-
-    stage("Verify OCI CLI and Kubernetes Connection") {
-      steps {
-        withCredentials([ociCredentials(credentialsId: 'ociconfig')]) {
-          withKubeConfig([credentialsId: 'k8s']) {
-            sh '''
-
-              echo "Checking Kubernetes connection..."
-              kubectl get pods -n jenkins
-            '''
-          }
+    agent {
+        kubernetes {
+            label 'jenkins-agent'
+            yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    jenkins/label: jenkins-agent
+spec:
+  containers:
+  - name: jnlp
+    image: siqueiraa/jenkins-inbound-agent-kubectl:latest
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: PATH
+      value: /opt/venv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+    volumeMounts:
+    - mountPath: /home/jenkins
+      name: workspace-volume
+  volumes:
+  - name: workspace-volume
+    emptyDir: {}
+"""
         }
-      }
     }
 
-    stage("Build & Push with Kaniko") {
-      steps {
-        container('kaniko') {
-          sh '''#!/busybox/sh
-              /kaniko/executor --dockerfile="${WORKSPACE}/Dockerfile" --context="${WORKSPACE}" --destination="${OCI_IMAGE_NAME}"
-            '''
-        }
-      }
+    environment {
+        APP_NAME = "complete-production-e2e-pipeline"
+        OCI_SERVER = "zrh.ocir.io"
+        OCI_NAMESPACE = "zrexacpiqwde"
+        OCI_REPO = "trader_go"
+        OCI_IMAGE_NAME = "${OCI_SERVER}/${OCI_NAMESPACE}/${APP_NAME}:latest"
+        PATH = "/opt/venv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
     }
-  }
+
+    stages {
+        stage("Cleanup Workspace") {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage("Test Environment") {
+            steps {
+                echo "Checking PATH..."
+                sh 'echo $PATH'
+                echo "Checking OCI CLI version..."
+                sh '/opt/venv/bin/oci --version'
+                echo "Checking kubectl version..."
+                sh '/usr/local/bin/kubectl version --client'
+                echo "Locating OCI CLI..."
+                sh 'which oci'
+                echo "Listing /opt/venv/bin..."
+                sh 'ls -l /opt/venv/bin'
+            }
+        }
+
+        stage("Checkout from SCM") {
+            steps {
+                git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/siqueiraa/complete-prodcution-e2e-pipeline.git'
+            }
+        }
+
+        stage("Verify OCI CLI and Kubernetes Connection") {
+            steps {
+                withCredentials([ociCredentials(credentialsId: 'MY_OCI_CREDENTIAL')]) {
+                    withKubeConfig([credentialsId: 'k8s']) {
+                        sh '''
+                          echo "Checking OCI CLI installation..."
+                          if ! command -v oci &> /dev/null
+                          then
+                              echo "OCI CLI could not be found"
+                              exit 1
+                          fi
+                          echo "OCI CLI found: $(oci --version)"
+
+                          echo "Checking Kubernetes connection..."
+                          kubectl get pods -n jenkins
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage("Build & Push with Kaniko") {
+            steps {
+                container('kaniko') {
+                    sh '''#!/busybox/sh
+                        /kaniko/executor --dockerfile="${WORKSPACE}/Dockerfile" --context="${WORKSPACE}" --destination="${OCI_IMAGE_NAME}"
+                    '''
+                }
+            }
+        }
+    }
 }
