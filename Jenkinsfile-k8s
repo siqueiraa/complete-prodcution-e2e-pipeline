@@ -23,16 +23,17 @@ spec:
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: IfNotPresent
     volumeMounts:
-    - name: kaniko-secret
-      mountPath: /kaniko/.docker
-    - mountPath: /home/jenkins
-      name: workspace-volume
+      - name: jenkins-docker-cfg
+        mountPath: /kaniko/.docker
   volumes:
-  - name: workspace-volume
-    emptyDir: {}
-  - name: kaniko-secret
-    secret:
-      secretName: dockerpasssecret
+  - name: jenkins-docker-cfg
+    projected:
+      sources:
+      - secret:
+          name: dockerpasssecret
+          items:
+            - key: .dockerconfigjson
+              path: config.json
 """
         }
     }
