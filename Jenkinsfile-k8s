@@ -16,11 +16,18 @@ pipeline {
       }
     }
 
-    stage("Check OCI CLI") {
+stage("Check Path") {
     steps {
-        sh 'oci --version'
+        sh 'echo $PATH'
     }
 }
+
+stage("Check OCI CLI Permissions") {
+    steps {
+        sh 'ls -l $(which oci)'
+    }
+}
+
 
 
     stage("Checkout from SCM") {
