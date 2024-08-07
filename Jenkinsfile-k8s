@@ -7,8 +7,7 @@ pipeline {
     OCI_NAMESPACE = "zrexacpiqwde"
     OCI_REPO = "trader_go"
     OCI_IMAGE_NAME = "${OCI_SERVER}/${OCI_NAMESPACE}/${APP_NAME}:latest"
-    PATH = "/opt/venv/bin:$PATH"
-  }
+    PATH = "/opt/venv/bin:/usr/local/bin:$PATH"  }
 
 
 
