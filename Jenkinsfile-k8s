@@ -1,5 +1,30 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            label 'jenkins-agent'
+            yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    jenkins/label: jenkins-agent
+spec:
+  containers:
+  - name: jnlp
+    image: siqueiraa/jenkins-inbound-agent-kubectl:latest
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: PATH
+      value: /opt/venv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+    volumeMounts:
+    - mountPath: /home/jenkins
+      name: workspace-volume
+  volumes:
+  - name: workspace-volume
+    emptyDir: {}
+"""
+        }
+    }
 
     environment {
         APP_NAME = "complete-production-e2e-pipeline"
