@@ -17,34 +17,6 @@ pipeline {
       }
     }
 
-    stage("List OCI CLI in venv") {
-    steps {
-        sh 'ls -l /opt/local/bin'
-    }
-}
-
-stage("Check Symbolic Link") {
-    steps {
-        sh 'ls -l /usr/local/bin/oci'
-    }
-}
-
-
-    stage("Test Environment") {
-      steps {
-        echo "Checking PATH..."
-        sh 'echo $PATH'
-        echo "Checking OCI CLI version..."
-        sh 'oci --version'
-        echo "Checking kubectl version..."
-        sh 'kubectl version --client'
-        echo "Locating OCI CLI..."
-        sh 'which oci'
-        echo "Listing /opt/venv/bin..."
-        sh 'ls -l /opt/venv/bin'
-      }
-    }
-
     stage("Checkout from SCM") {
       steps {
         git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/siqueiraa/complete-prodcution-e2e-pipeline.git'
@@ -56,13 +28,6 @@ stage("Check Symbolic Link") {
         withCredentials([file(credentialsId: 'ociconfig', variable: 'OCI_CONFIG_FILE')]) {
           withKubeConfig([credentialsId: 'k8s']) {
             sh '''
-              echo "Checking OCI CLI installation..."
-              if ! command -v oci &> /dev/null
-              then
-                  echo "OCI CLI could not be found"
-                  exit 1
-              fi
-              echo "OCI CLI found: $(oci --version)"
 
               echo "Checking Kubernetes connection..."
               kubectl get pods -n jenkins
