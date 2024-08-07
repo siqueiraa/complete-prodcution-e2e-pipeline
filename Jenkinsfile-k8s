@@ -21,11 +21,13 @@ pipeline {
 stage("Setup OCI CLI") {
     steps {
         sh '''
+        #!/bin/bash
         source /opt/venv/bin/activate
         oci --version
         '''
     }
 }
+
 
 
 
