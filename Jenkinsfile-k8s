@@ -22,11 +22,13 @@ pipeline {
     }
 
 
-  stage("Check Venv") {
-    steps {
-        sh 'ls -la /opt/venv/bin'
-    }
-}
+stage('Test Environment') {
+            steps {
+                sh 'oci --version'
+                sh 'kubectl version --client'
+                sh 'which oci'
+            }
+        }
 
 
 
