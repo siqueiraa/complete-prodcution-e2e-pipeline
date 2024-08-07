@@ -7,6 +7,8 @@ pipeline {
     OCI_NAMESPACE = "zrexacpiqwde"
     OCI_REPO = "trader_go"
     OCI_IMAGE_NAME = "${OCI_SERVER}/${OCI_NAMESPACE}/${APP_NAME}:latest"
+    PATH = "/opt/venv/bin:$PATH"
+
   }
 
   stages {
@@ -16,21 +18,12 @@ pipeline {
       }
     }
 
-stage("Check Path") {
+stage("Setup OCI CLI") {
     steps {
-        sh 'echo $PATH'
-    }
-}
-
-stage("Check OCI CLI Permissions") {
-    steps {
-        sh 'ls -l $(which oci)'
-    }
-}
-
-stage("Find OCI CLI") {
-    steps {
-        sh 'find / -name oci 2>/dev/null'
+        sh '''
+        source /opt/venv/bin/activate
+        oci --version
+        '''
     }
 }
 
