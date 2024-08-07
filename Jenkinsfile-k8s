@@ -1,42 +1,9 @@
 pipeline {
-    agent {
-        kubernetes {
-            label 'jenkins-agent'
-            yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    jenkins/label: jenkins-agent
-spec:
-  containers:
-  - name: jnlp
-    image: siqueiraa/jenkins-inbound-agent-kubectl:latest
-    imagePullPolicy: IfNotPresent
-    env:
-    - name: PATH
-      value: /opt/venv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-    volumeMounts:
-    - mountPath: /home/jenkins
-      name: workspace-volume
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:debug
-    imagePullPolicy: IfNotPresent
-    volumeMounts:
-      - name: jenkins-docker-cfg
-        mountPath: /kaniko/.docker
-  volumes:
-  - name: jenkins-docker-cfg
-    projected:
-      sources:
-      - secret:
-          name: dockerpasssecret
-          items:
-            - key: .dockerconfigjson
-              path: config.json
-"""
-        }
+      agent {
+    kubernetes {
+      yamlFile 'kaniko-builder.yaml'
     }
+  }
 
     environment {
         APP_NAME = "complete-production-e2e-pipeline"
