@@ -22,6 +22,14 @@ spec:
   volumes:
   - name: workspace-volume
     emptyDir: {}
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: IfNotPresent
+  volumeMounts:
+    - name: kaniko-secret
+      mountPath: /kaniko/.docker
+    - mountPath: /home/jenkins
+      name: workspace-volume
 """
         }
     }
