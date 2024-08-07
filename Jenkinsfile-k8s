@@ -19,7 +19,7 @@ pipeline {
 
     stage("List OCI CLI in venv") {
     steps {
-        sh 'ls -l /opt/venv/bin'
+        sh 'ls -l /opt/local/bin'
     }
 }
 
