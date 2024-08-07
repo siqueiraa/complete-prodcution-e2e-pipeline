@@ -4,6 +4,9 @@ spec:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
+    env:
+      - name: PATH
+        value: /opt/venv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
     command:
     - sleep
     args:
@@ -11,6 +14,8 @@ spec:
     volumeMounts:
       - name: jenkins-docker-cfg
         mountPath: /kaniko/.docker
+      - name: workspace-volume
+        mountPath: /home/jenkins
   volumes:
   - name: jenkins-docker-cfg
     projected:
