@@ -4,19 +4,13 @@ spec:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
-    env:
-      - name: PATH
-        value: /opt/venv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
     command:
-    - sh
+    - sleep
     args:
-    - -c
-    - "while true; do sleep 3600; done"  # Executa 'sleep' a cada hora em loop infinito
+    - 9999999
     volumeMounts:
       - name: jenkins-docker-cfg
         mountPath: /kaniko/.docker
-      - name: workspace-volume
-        mountPath: /home/jenkins
   volumes:
   - name: jenkins-docker-cfg
     projected:
