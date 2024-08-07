@@ -68,14 +68,6 @@ spec:
                 withCredentials([ociCredentials(credentialsId: 'ociconfig')]) {
                     withKubeConfig([credentialsId: 'k8s']) {
                         sh '''
-                          echo "Checking OCI CLI installation..."
-                          if ! command -v oci &> /dev/null
-                          then
-                              echo "OCI CLI could not be found"
-                              exit 1
-                          fi
-                          echo "OCI CLI found: $(oci --version)"
-
                           echo "Checking Kubernetes connection..."
                           kubectl get pods -n jenkins
                         '''
