@@ -10,12 +10,8 @@ pipeline {
     PATH = "/opt/venv/bin:$PATH"
   }
 
-  stages{
-  stage("Check Venv") {
-    steps {
-        sh 'ls -la /opt/venv/bin'
-    }
-}}
+
+
 
 
   stages {
@@ -26,7 +22,11 @@ pipeline {
     }
 
 
-
+  stage("Check Venv") {
+    steps {
+        sh 'ls -la /opt/venv/bin'
+    }
+}
 
 
 
