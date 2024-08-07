@@ -8,9 +8,10 @@ spec:
       - name: PATH
         value: /opt/venv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
     command:
-    - sleep
+    - sh
     args:
-    - 9999999
+    - -c
+    - "while true; do sleep 3600; done"  # Executa 'sleep' a cada hora em loop infinito
     volumeMounts:
       - name: jenkins-docker-cfg
         mountPath: /kaniko/.docker
