@@ -5,13 +5,10 @@ pipeline {
     APP_NAME = "complete-production-e2e-pipeline"
     OCI_SERVER = "zrh.ocir.io"
     OCI_NAMESPACE = "zrexacpiqwde"
-    OCI_REPO = "trader_go"
     OCI_IMAGE_NAME = "${OCI_SERVER}/${OCI_NAMESPACE}/${APP_NAME}:latest"
-    PATH = "/opt/venv/bin:/usr/local/bin:$PATH"  }
-
-
-
-
+    // Ensure the PATH is correctly set
+    PATH = "/opt/venv/bin:/usr/local/bin:$PATH"
+  }
 
   stages {
     stage("Cleanup Workspace") {
@@ -20,16 +17,20 @@ pipeline {
       }
     }
 
-
-stage('Test Environment') {
-            steps {
-                sh 'oci --version'
-                sh 'kubectl version --client'
-                sh 'which oci'
-            }
-        }
-
-
+    stage("Test Environment") {
+      steps {
+        echo "Checking PATH..."
+        sh 'echo $PATH'
+        echo "Checking OCI CLI version..."
+        sh 'oci --version'
+        echo "Checking kubectl version..."
+        sh 'kubectl version --client'
+        echo "Locating OCI CLI..."
+        sh 'which oci'
+        echo "Listing /opt/venv/bin..."
+        sh 'ls -l /opt/venv/bin'
+      }
+    }
 
     stage("Checkout from SCM") {
       steps {
@@ -39,7 +40,7 @@ stage('Test Environment') {
 
     stage("Verify OCI CLI and Kubernetes Connection") {
       steps {
-        withCredentials([ociCredential(credentialsId: 'ociconfig')]) {
+        withCredentials([file(credentialsId: 'ociconfig', variable: 'OCI_CONFIG_FILE')]) {
           withKubeConfig([credentialsId: 'k8s']) {
             sh '''
               echo "Checking OCI CLI installation..."
@@ -49,6 +50,7 @@ stage('Test Environment') {
                   exit 1
               fi
               echo "OCI CLI found: $(oci --version)"
+
               echo "Checking Kubernetes connection..."
               kubectl get pods -n jenkins
             '''
