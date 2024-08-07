@@ -32,7 +32,7 @@ spec:
     emptyDir: {}
   - name: kaniko-secret
     secret:
-      secretName: kaniko-secret
+      secretName: dockerpasssecret
 """
         }
     }
